@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InstaWin — Instagram Giveaway Winner Picker</title>
+  <meta name="description" content="Fair Instagram giveaway winner picker. Paste a post, set conditions, and pick a random winner from real comments." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ig-pink: #E1306C;
+      --ig-purple: #833AB4;
+      --ig-orange: #F77737;
+      --ig-gradient: linear-gradient(45deg, #F58529, #DD2A7B, #8134AF, #515BD4);
+      --bg: #0f0f13;
+      --surface: #1a1a22;
+      --surface-2: #242430;
+      --border: #2e2e3a;
+      --text: #f5f5f7;
+      --text-muted: #a0a0b0;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 16px;
+      --shadow: 0 10px 40px rgba(0,0,0,0.45);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15,15,19,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+    }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--ig-gradient);
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+    }
+    .badge {
+      font-size: 0.7rem;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 50px 24px 30px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .hero h1 {
+      font-size: clamp(1.9rem, 5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+      background: var(--ig-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto 80px;
+      padding: 0 20px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--ig-gradient);
+      display: grid;
+      place-items: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    input[type="text"],
+    input[type="url"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--ig-pink);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 560px) {
+      .row { grid-template-columns: 1fr; }
+    }
+
+    .toggles {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-2);
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .toggle-row span { font-size: 0.9rem; font-weight: 500; }
+    .toggle-row small {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      margin-top: 2px;
+    }
+    .switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #3a3a4a;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+    .slider:before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.25s;
+    }
+    input:checked + .slider { background: var(--ig-gradient); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 13px 22px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+      font-family: inherit;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: var(--ig-gradient);
+      color: white;
+      width: 100%;
+      margin-top: 16px;
+    }
+    .btn-primary:hover { opacity: 0.92; }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .status {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.loading {
+      background: rgba(131, 58, 180, 0.15);
+      border: 1px solid rgba(131, 58, 180, 0.35);
+      color: #c4a0e8;
+    }
+    .status.success {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #86efac;
+    }
+    .status.error {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+    .status.info {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fcd34d;
+    }
+
+    .entries-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .entries-count {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .entries-list {
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-2);
+    }
+    .entry {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .entry:last-child { border-bottom: none; }
+    .entry-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--ig-gradient);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: white;
+      flex-shrink: 0;
+    }
+    .entry-info { flex: 1; min-width: 0; }
+    .entry-user { font-weight: 600; }
+    .entry-text {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .entry-tags {
+      font-size: 0.75rem;
+      color: var(--ig-pink);
+    }
+
+    .draw-area {
+      text-align: center;
+      padding: 28px 20px;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .draw-placeholder {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .spinning-name {
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: var(--ig-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .winner-card {
+      display: none;
+      width: 100%;
+      max-width: 380px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 26px 22px;
+      text-align: center;
+      animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .winner-card.show { display: block; }
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .winner-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: var(--ig-gradient);
+      display: grid;
+      place-items: center;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: white;
+      margin: 0 auto 12px;
+      box-shadow: 0 0 0 4px rgba(225, 48, 108, 0.25);
+    }
+    .winner-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--success);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .winner-name {
+      font-size: 1.45rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .winner-comment {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      font-style: italic;
+    }
+    .verify-code {
+      background: var(--bg);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      font-family: ui-monospace, monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .winner-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      top: -10px;
+      opacity: 0;
+      animation: fall 2.8s ease-out forwards;
+    }
+    @keyframes fall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(320px) rotate(720deg); }
+    }
+
+    .notice {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 12px;
+      padding: 13px 15px;
+      font-size: 0.84rem;
+      color: #fcd34d;
+      margin-bottom: 22px;
+      line-height: 1.55;
+    }
+    .notice strong { color: #fde68a; }
+
+    footer {
+      text-align: center;
+      padding: 36px 20px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🎁</div>
+      InstaWin
+      <span class="badge">Real</span>
+    </div>
+    <div style="font-size:0.8rem;color:var(--text-muted)">Fair • Transparent • Random</div>
+  </header>
+
+  <section class="hero">
+    <h1>Pick a Fair Instagram Winner</h1>
+    <p>Paste a public Instagram post or Reel, set your rules, and draw a random winner from the real comments.</p>
+  </section>
+
+  <div class="container">
+    <div class="notice">
+      <strong>How it works:</strong> This tool fetches real public comments from Instagram.  
+      Large posts may only return a partial list because Instagram limits anonymous access.  
+      “Must follow” and “Must like” cannot be verified automatically — always check the winner manually.
+    </div>
+
+    <!-- Step 1 -->
+    <div class="card">
+      <h2><span class="step">1</span> Instagram Post URL</h2>
+      <label for="postUrl">Paste the full link of your post or Reel</label>
+      <input type="url" id="postUrl" placeholder="https://www.instagram.com/p/XXXXX/ or /reel/XXXXX/" />
+      <button class="btn btn-primary" id="fetchBtn">
+        <span>⚡</span> Fetch Real Comments
+      </button>
+      <div class="status" id="fetchStatus"></div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="card" id="filtersCard" style="opacity:0.5;pointer-events:none;">
+      <h2><span class="step">2</span> Entry Conditions</h2>
+
+      <div class="row">
+        <div>
+          <label for="numWinners">Number of winners</label>
+          <input type="number" id="numWinners" min="1" max="20" value="1" />
+        </div>
+        <div>
+          <label for="minTags">Minimum tagged friends (@)</label>
+          <input type="number" id="minTags" min="0" max="10" value="0" />
+        </div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <label for="requiredHashtag">Required hashtag / keyword (optional)</label>
+        <input type="text" id="requiredHashtag" placeholder="#giveaway or any keyword" />
+      </div>
+
+      <div class="toggles">
+        <div class="toggle-row">
+          <div>
+            <span>Remove duplicate users</span>
+            <small>One entry per Instagram account</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="removeDuplicates" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <span>Must follow the account</span>
+            <small>⚠️ Manual check still required</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="mustFollow" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <span>Must like the post</span>
+            <small>⚠️ Manual check still required</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="mustLike" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <span>Include comment replies</span>
+            <small>Count replies as separate entries</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="includeReplies" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="applyFiltersBtn" style="margin-top:16px;">
+        Apply Filters & Show Eligible Entries
+      </button>
+    </div>
+
+    <!-- Eligible entries -->
+    <div class="card hidden" id="entriesCard">
+      <div class="entries-header">
+        <h2 style="margin:0;"><span class="step">3</span> Eligible Entries</h2>
+        <span class="entries-count" id="entriesCount">0 entries</span>
+      </div>
+      <div class="entries-list" id="entriesList"></div>
+      <button class="btn btn-primary" id="drawBtn" style="margin-top:16px;">
+        🎲 Draw Winner
+      </button>
+    </div>
+
+    <!-- Draw result -->
+    <div class="card hidden" id="drawCard">
+      <h2><span class="step">4</span> Winner Selection</h2>
+      <div class="draw-area" id="drawArea">
+        <div class="draw-placeholder" id="drawPlaceholder">Press the button to start the live draw…</div>
+        <div class="spinning-name hidden" id="spinningName"></div>
+        <div class="winner-card" id="winnerCard">
+          <div class="winner-avatar" id="winnerAvatar">W</div>
+          <div class="winner-label">🎉 Winner</div>
+          <div class="winner-name" id="winnerName">@username</div>
+          <div class="winner-comment" id="winnerComment">"comment text"</div>
+          <div class="verify-code" id="verifyCode">Verification: XXXX-XXXX</div>
+          <div class="winner-actions">
+            <button class="btn btn-secondary" id="copyWinnerBtn">Copy @username</button>
+            <button class="btn btn-ghost" id="redrawBtn">Draw again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Self-hosted Instagram Giveaway Picker • Not affiliated with Instagram or Meta<br />
+    Always follow Instagram’s Promotion Guidelines and local contest laws.
+  </footer>
+
+  <script>
+    let allComments = [];
+    let eligible = [];
+
+    const fetchBtn = document.getElementById('fetchBtn');
+    const fetchStatus = document.getElementById('fetchStatus');
+    const filtersCard = document.getElementById('filtersCard');
+    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+    const entriesCard = document.getElementById('entriesCard');
+    const entriesList = document.getElementById('entriesList');
+    const entriesCount = document.getElementById('entriesCount');
+    const drawBtn = document.getElementById('drawBtn');
+    const drawCard = document.getElementById('drawCard');
+    const drawArea = document.getElementById('drawArea');
+    const drawPlaceholder = document.getElementById('drawPlaceholder');
+    const spinningName = document.getElementById('spinningName');
+    const winnerCard = document.getElementById('winnerCard');
+    const winnerAvatar = document.getElementById('winnerAvatar');
+    const winnerName = document.getElementById('winnerName');
+    const winnerComment = document.getElementById('winnerComment');
+    const verifyCode = document.getElementById('verifyCode');
+    const copyWinnerBtn = document.getElementById('copyWinnerBtn');
+    const redrawBtn = document.getElementById('redrawBtn');
+
+    function showStatus(el, type, msg) {
+      el.className = 'status show ' + type;
+      el.innerHTML = msg;
+    }
+
+    function countTags(text) {
+      const matches = (text || '').match(/@[a-zA-Z0-9._]+/g) || [];
+      return matches.length;
+    }
+
+    // Fetch real comments
+    fetchBtn.addEventListener('click', async () => {
+      const url = document.getElementById('postUrl').value.trim();
+      if (!url || !url.includes('instagram.com')) {
+        showStatus(fetchStatus, 'error', 'Please enter a valid Instagram post or Reel URL.');
+        return;
+      }
+
+      fetchBtn.disabled = true;
+      showStatus(fetchStatus, 'loading', '⏳ Fetching real comments from Instagram… This can take 10–30 seconds.');
+
+      try {
+        const res = await fetch('/api/comments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to fetch comments');
+        }
+
+        allComments = (data.comments || []).map(c => ({
+          user: c.user,
+          text: c.text,
+          tags: c.tags ?? countTags(c.text),
+          isReply: !!c.isReply,
+          id: c.id,
+        }));
+
+        let msg = `✅ Loaded <strong>${allComments.length} real comments</strong> from the post.`;
+        if (data.note) {
+          msg += `<br><small style="opacity:0.85">${data.note}</small>`;
+        }
+        showStatus(fetchStatus, 'success', msg);
+
+        filtersCard.style.opacity = '1';
+        filtersCard.style.pointerEvents = 'auto';
+      } catch (err) {
+        showStatus(fetchStatus, 'error', `❌ ${err.message}`);
+      } finally {
+        fetchBtn.disabled = false;
+      }
+    });
+
+    // Apply filters
+    applyFiltersBtn.addEventListener('click', () => {
+      if (!allComments.length) return;
+
+      const minTags = parseInt(document.getElementById('minTags').value) || 0;
+      const hashtag = (document.getElementById('requiredHashtag').value || '').trim().toLowerCase();
+      const removeDup = document.getElementById('removeDuplicates').checked;
+      const includeReplies = document.getElementById('includeReplies').checked;
+
+      let filtered = allComments.filter(c => {
+        if (!includeReplies && c.isReply) return false;
+        if ((c.tags || 0) < minTags) return false;
+        if (hashtag && !(c.text || '').toLowerCase().includes(hashtag)) return false;
+        return true;
+      });
+
+      if (removeDup) {
+        const seen = new Set();
+        filtered = filtered.filter(c => {
+          const key = (c.user || '').toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+      }
+
+      // Note: mustFollow / mustLike are UI-only reminders. Real verification is manual.
+      eligible = filtered;
+      renderEntries();
+      entriesCard.classList.remove('hidden');
+      drawCard.classList.add('hidden');
+      winnerCard.classList.remove('show');
+      spinningName.classList.add('hidden');
+      drawPlaceholder.classList.remove('hidden');
+    });
+
+    function renderEntries() {
+      entriesCount.textContent = `${eligible.length} eligible entr${eligible.length === 1 ? 'y' : 'ies'}`;
+      if (!eligible.length) {
+        entriesList.innerHTML = '<div class="entry" style="justify-content:center;color:var(--text-muted);">No entries match your filters.</div>';
+        drawBtn.disabled = true;
+        return;
+      }
+      drawBtn.disabled = false;
+      entriesList.innerHTML = eligible.map(c => `
+        <div class="entry">
+          <div class="entry-avatar">${(c.user || '?')[0].toUpperCase()}</div>
+          <div class="entry-info">
+            <div class="entry-user">@${c.user}</div>
+            <div class="entry-text">${escapeHtml(c.text || '')}</div>
+          </div>
+          ${c.tags > 0 ? `<div class="entry-tags">${c.tags} tag${c.tags > 1 ? 's' : ''}</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Draw
+    drawBtn.addEventListener('click', () => startDraw());
+    redrawBtn.addEventListener('click', () => startDraw());
+
+    function startDraw() {
+      if (!eligible.length) return;
+      drawCard.classList.remove('hidden');
+      winnerCard.classList.remove('show');
+      drawPlaceholder.classList.add('hidden');
+      spinningName.classList.remove('hidden');
+      spinningName.textContent = '';
+
+      const duration = 2600;
+      const interval = 70;
+      let elapsed = 0;
+
+      const spin = setInterval(() => {
+        const random = eligible[Math.floor(Math.random() * eligible.length)];
+        spinningName.textContent = '@' + random.user;
+        elapsed += interval;
+        if (elapsed >= duration) {
+          clearInterval(spin);
+          finishDraw();
+        }
+      }, interval);
+    }
+
+    function finishDraw() {
+      const array = new Uint32Array(1);
+      crypto.getRandomValues(array);
+      const idx = array[0] % eligible.length;
+      const winner = eligible[idx];
+
+      spinningName.classList.add('hidden');
+      winnerAvatar.textContent = (winner.user || 'W')[0].toUpperCase();
+      winnerName.textContent = '@' + winner.user;
+      winnerComment.textContent = '"' + (winner.text || '') + '"';
+      verifyCode.textContent = 'Verification code: ' + generateCode();
+      winnerCard.classList.add('show');
+      createConfetti();
+    }
+
+    function generateCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code += chars[Math.floor(Math.random() * chars.length)];
+        if (i === 3) code += '-';
+      }
+      return code;
+    }
+
+    function createConfetti() {
+      const colors = ['#E1306C', '#833AB4', '#F77737', '#22c55e', '#3b82f6', '#f59e0b'];
+      for (let i = 0; i < 36; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.style.left = Math.random() * 100 + '%';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.animationDelay = (Math.random() * 0.5) + 's';
+        el.style.width = (6 + Math.random() * 8) + 'px';
+        el.style.height = el.style.width;
+        el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        drawArea.appendChild(el);
+        setTimeout(() => el.remove(), 3000);
+      }
+    }
+
+    copyWinnerBtn.addEventListener('click', () => {
+      const name = winnerName.textContent;
+      navigator.clipboard.writeText(name).then(() => {
+        copyWinnerBtn.textContent = 'Copied!';
+        setTimeout(() => copyWinnerBtn.textContent = 'Copy @username', 1500);
+      });
+    });
+  </script>
+</body>
+</html>
