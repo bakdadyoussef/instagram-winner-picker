@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Post Winners</title>
+    <link rel="icon" href="holderpfp.jpg" type="image/jpeg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Noto Sans Arabic', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcb045);
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #efefef;
+        }
+        
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+            border: 2px solid #e1306c;
+        }
+        
+        .username {
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .post-media {
+            width: 100%;
+            height: 350px;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+        }
+        
+        .post-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .post-actions {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #efefef;
+        }
+        
+        .action-icons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .action-icons i {
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .action-icons i:hover {
+            color: #e1306c;
+        }
+        
+        .post-caption {
+            padding: 0 15px;
+            margin-bottom: 15px;
+            color: #262626;
+            line-height: 1.6;
+        }
+        
+        .caption-text {
+            margin-bottom: 10px;
+        }
+        
+        .comments-section {
+            padding: 15px;
+            background: #fafafa;
+            border-top: 1px solid #efefef;
+        }
+        
+        .fetching-comments {
+            text-align: center;
+            padding: 20px;
+            color: #8e8e8e;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 15px;
+            border: 4px solid #e1306c;
+            border-left: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .comment {
+            display: flex;
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        
+        .comment:nth-child(1)  { animation-delay: 0.4s; }
+        .comment:nth-child(2)  { animation-delay: 0.7s; }
+        .comment:nth-child(3)  { animation-delay: 1.0s; }
+        .comment:nth-child(4)  { animation-delay: 1.3s; }
+        .comment:nth-child(5)  { animation-delay: 1.6s; }
+        .comment:nth-child(6)  { animation-delay: 1.9s; }
+        .comment:nth-child(7)  { animation-delay: 2.2s; }
+        .comment:nth-child(8)  { animation-delay: 2.5s; }
+        .comment:nth-child(9)  { animation-delay: 2.8s; }
+        .comment:nth-child(10) { animation-delay: 3.1s; }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .comment-content {
+            flex-grow: 1;
+        }
+        
+        .comment-username {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        
+        .comment-text {
+            color: #262626;
+            line-height: 1.4;
+        }
+        
+        .winner-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+            background: linear-gradient(45deg, #833ab4, #fd1d1d);
+            color: white;
+        }
+        
+        .post-time {
+            padding: 15px;
+            color: #8e8e8e;
+            font-size: 12px;
+            border-top: 1px solid #efefef;
+            text-transform: uppercase;
+        }
+        
+        .trophy {
+            font-size: 18px;
+            margin-right: 5px;
+            color: #833ab4;
+        }
+        
+        .tag {
+            color: #00376b;
+            font-weight: 600;
+        }
+        
+        .more-text {
+            color: #8e8e8e;
+            margin-top: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .fallback-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .short-caption {
+            display: block;
+        }
+        
+        .full-caption {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="post-header">
+            <img src="holderpfp.jpg" class="profile-img" alt="Profile Picture" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <img src="https://picsum.photos/seed/spynona/200" class="profile-img fallback-img" alt="Fallback Profile Picture">
+            <div class="username">spynona</div>
+        </div>
+        
+        <!-- ========== POST IMAGE ========== -->
+        <div class="post-media">
+            <img src="post.png" class="post-image" alt="Post Image" 
+                 onerror="post.png'">
+        </div>
+        
+        <div class="post-actions">
+            <div class="action-icons">
+                <i class="far fa-heart"></i>
+                <i class="far fa-comment"></i>
+                <i class="far fa-paper-plane"></i>
+            </div>
+            <div class="action-icons">
+                <i class="far fa-bookmark"></i>
+            </div>
+        </div>
+        
+        <!-- ========== CAPTION ========== -->
+        <div class="post-caption">
+            <div class="short-caption">
+                <span class="username">spynona</span> ✿ اهلا مسابقة على " 10 ولكن مقدمة من المتجر الأفضل كاردمينيا 🤭 " ୨୧
+                <div class="more-text" onclick="expandCaption()">المزيد...</div>
+            </div>
+            
+            <div class="full-caption" id="full-caption">
+                <div class="caption-text">
+                    ✿ شروط المسابقة 👇🏻୨୧<br><br>
+                    ✿ تابع الحسابات 👈🏻 <span class="tag">@spynona</span> <span class="tag">@isomi_1</span> <span class="tag">@cardmaiinia</span><br>
+                    ✿ لايك للبوست ୨୧<br>
+                    ✿ ريبوست اذا متوفر ୨୧<br><br>
+                    ✿ انشر البوست ستوري // اذا حسابك خاص ترسل سكرين لنا ୨୧<br>
+                    ( اذا حسابك عام لا ترسل سكرين بالخاص )<br><br>
+                    ✿ منشن 2 من أصدقائك " مسموح التكرار بتغيير الأشخاص " ୨୧<br><br>
+                    ✿ السحب بعد اسبوع من الآن ୨୧<br><br>
+                    تأكد مطبق كل الشروط وبالتوفيق ✅ 💗
+                </div>
+                
+                <div class="more-text" onclick="this.style.display='none';document.getElementById('more-text').style.display='block'">
+                    ...المزيد
+                </div>
+                
+                <div id="more-text" style="display: none;">
+                    <div class="caption-text">
+                        ‼️ متجر كاردمينيا خيارك الأول الموثوق للشحن في العابك من خلال ال id حتى يقدم لكم العروض والمسابقات دايما<br><br>
+                        - اكواد داخل المتجر توفر عليك somi & nona ‼️ الرابط بايو او من خلال تطبيقهم الخاص 💕<br><br>
+                        #genshinimpact
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="comments-section">
+            <div class="fetching-comments" id="fetching">
+                <div class="spinner"></div>
+                <p>Fetching comments and selecting winners...</p>
+            </div>
+            
+            <div id="winner-comments" style="display: none;">
+                
+                <!-- Winner 1 -->
+                <div class="comment">
+                    <img src="just_aya.exe.png" class="comment-avatar" alt="Winner" onerror="this.src='https://picsum.photos/seed/just_aya/200'">
+                    <div class="comment-content">
+                        <div class="comment-username">
+                            <i class="fas fa-trophy trophy"></i>
+                            @just_aya.exe
+                            <span class="winner-badge">WINNER</span>
+                        </div>
+                        <div class="comment-text">@shinjij.i @saraiiii.su</div>
+                    </div>
+                </div>
+                
+                <!-- Winner 2 -->
+                <div class="comment">
+                    <img src="so_r9l.png" class="comment-avatar" alt="Winner" onerror="this.src='https://picsum.photos/seed/so_r9l/200'">
+                    <div class="comment-content">
+                        <div class="comment-username">
+                            <i class="fas fa-trophy trophy"></i>
+                            @so_r9l
+                            <span class="winner-badge">WINNER</span>
+                        </div>
+                        <div class="comment-text">@dul21l @subaz24</div>
+                    </div>
+                </div>
+                
+                <!-- Winner 3 -->
+                <div class="comment">
+                    <img src="lulu.156xo.png" class="comment-avatar" alt="Winner" onerror="this.src='https://picsum.photos/seed/lulu156xo/200'">
+                    <div class="comment-content">
+                        <div class="comment-username">
+                            <i class="fas fa-trophy trophy"></i>
+                            @lulu.156xo
+                            <span class="winner-badge">WINNER</span>
+                        </div>
+                        <div class="comment-text">@sal_75xo @aimy.xo156</div>
+                    </div>
+                </div>
+                
+                <!-- Winner 4 -->
+                <div class="comment">
+                    <img src="mr_shardan.png" class="comment-avatar" alt="Winner" onerror="this.src='https://picsum.photos/seed/mr_shardan/200'">
+                    <div class="comment-content">
+                        <div class="comment-username">
+                            <i class="fas fa-trophy trophy"></i>
+                            @mr_shardan
+                            <span class="winner-badge">WINNER</span>
+                        </div>
+                        <div class="comment-text">@ziaa.doh @lady.bug2595</div>
+                    </div>
+                </div>
+                
+                <!-- Winner 5 -->
+                <div class="comment">
+                    <img src="ro_40rr.png" class="comment-avatar" alt="Winner" onerror="this.src='https://picsum.photos/seed/ro_40rr/200'">
+                    <div class="comment-content">
+                        <div class="comment-username">
+                            <i class="fas fa-trophy trophy"></i>
+                            @ro_40rr
+                            <span class="winner-badge">WINNER</span>
+                        </div>
+                        <div class="comment-text">@jm7_r @m_momo11m</div>
+                    </div>
+                </div>
+                
+                <!-- Winner 6 -->
+                <div class="comment">
+                    <img src="hiyuki719.png" class="comment-avatar" alt="Winner" onerror="this.src='https://picsum.photos/seed/hiyuki719/200'">
+                    <div class="comment-content">
+                        <div class="comment-username">
+                            <i class="fas fa-trophy trophy"></i>
+                            @hiyuki719
+                            <span class="winner-badge">WINNER</span>
+                        </div>
+                        <div class="comment-text">@its.yuki99 @basmlla8023</div>
+                    </div>
+                </div>
+                
+                <!-- Winner 7 -->
+                <div class="comment">
+                    <img src="hatsumi_sawako.png" class="comment-avatar" alt="Winner" onerror="this.src='https://picsum.photos/seed/hatsumi/200'">
+                    <div class="comment-content">
+                        <div class="comment-username">
+                            <i class="fas fa-trophy trophy"></i>
+                            @hatsumi_sawako
+                            <span class="winner-badge">WINNER</span>
+                        </div>
+                        <div class="comment-text">@colo._.x1 @mea.w_.0</div>
+                    </div>
+                </div>
+                
+                <!-- Winner 8 -->
+                <div class="comment">
+                    <img src="shahed._1r.png" class="comment-avatar" alt="Winner" onerror="this.src='https://picsum.photos/seed/shahed/200'">
+                    <div class="comment-content">
+                        <div class="comment-username">
+                            <i class="fas fa-trophy trophy"></i>
+                            @shahed._1r
+                            <span class="winner-badge">WINNER</span>
+                        </div>
+                        <div class="comment-text">@mbdlrhmnlmytny @h.n.a.s3 @mmcc_67</div>
+                    </div>
+                </div>
+                
+                <!-- Winner 9 -->
+                <div class="comment">
+                    <img src="ew_gg0.png" class="comment-avatar" alt="Winner" onerror="this.src='https://picsum.photos/seed/ew_gg0/200'">
+                    <div class="comment-content">
+                        <div class="comment-username">
+                            <i class="fas fa-trophy trophy"></i>
+                            @ew_gg0
+                            <span class="winner-badge">WINNER</span>
+                        </div>
+                        <div class="comment-text">@bat.9z @scpxo_o</div>
+                    </div>
+                </div>
+                
+                <!-- Winner 10 -->
+                <div class="comment">
+                    <img src="1_.js.a.png" class="comment-avatar" alt="Winner" onerror="this.src='https://picsum.photos/seed/1js_a/200'">
+                    <div class="comment-content">
+                        <div class="comment-username">
+                            <i class="fas fa-trophy trophy"></i>
+                            @1_.js.a
+                            <span class="winner-badge">WINNER</span>
+                        </div>
+                        <div class="comment-text">@sa_37_ra @dragon.536691</div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        <div class="post-time">7 DAYS AGO</div>
+    </div>
+
+    <script>
+        function expandCaption() {
+            document.querySelector('.short-caption').style.display = 'none';
+            document.getElementById('full-caption').style.display = 'block';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show winners after 10 seconds
+            setTimeout(function() {
+                document.getElementById('fetching').style.display = 'none';
+                document.getElementById('winner-comments').style.display = 'block';
+            }, 10000);
+        });
+    </script>
+</body>
+</html>
